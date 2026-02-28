@@ -113,7 +113,7 @@
 
         async function clearChat() {
             if(confirm("Reset for a new case? This wipes all temporary session data.")) {
-                await fetch('http://localhost:3001/api/clear-session', { method: 'POST' });
+                await fetch('https://afropix-2026-backend.onrender.com/api/clear-session', { method: 'POST' });
                 location.reload();
             }
         }
@@ -139,7 +139,7 @@
     const loadingId = addBubble("Navigating the Statutes...", 'bot');
 
     try {
-        const response = await fetch('http://localhost:3001/api/chat', {
+        const response = await fetch('https://afropix-2026-backend.onrender.com/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
