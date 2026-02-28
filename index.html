@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B & E Solutions | Greensboro Navigator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-bubble { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col font-sans text-slate-900">
+
+    <header class="bg-white p-4 shadow-sm border-b-2 border-blue-600 sticky top-0 z-20">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-black italic tracking-tighter text-slate-800">B & E SOLUTIONS</h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                    </span>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">57,407 Legal Chunks Indexed</p>
+                </div>
+            </div>
+            <button onclick="clearChat()" class="text-[10px] font-bold bg-slate-100 px-4 py-2 rounded-full hover:bg-red-50 text-slate-500 hover:text-red-600 transition border border-slate-200">
+                + NEW CASE
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 p-4 overflow-hidden">
+        
+        <section class="hidden md:block md:col-span-3 space-y-4">
+            <div class="bg-white p-5 rounded-2xl border shadow-sm">
+                <h2 class="font-black text-xs mb-4 uppercase text-blue-600 tracking-widest">Local Aid (Greensboro)</h2>
+                <div id="clinics" class="space-y-4"></div>
+            </div>
+            
+            <div class="space-y-2 mt-4">
+    <a href="resources.html" class="block w-full py-3 bg-blue-50 text-blue-700 text-center rounded-xl font-black text-[10px] uppercase border border-blue-100 hover:bg-blue-600 hover:text-white transition">
+        📂 Local Aid Resources
+    </a>
+    <a href="mission.html" class="block w-full py-3 bg-slate-50 text-slate-600 text-center rounded-xl font-black text-[10px] uppercase border border-slate-200 hover:bg-slate-800 hover:text-white transition">
+        ⚖️ Our Mission
+    </a>
+</div>
+
+            <div class="p-4 bg-blue-900 text-white rounded-2xl shadow-lg">
+                <p class="text-[11px] italic font-medium leading-relaxed">
+                    "A lawyer is either a social engineer or a parasite on society." 
+                </p>
+                <p class="text-[9px] mt-2 font-bold uppercase opacity-70">— Charles Hamilton Houston</p>
+            </div>
+        </section>
+
+        <section class="md:col-span-9 flex flex-col bg-white rounded-2xl shadow-xl border overflow-hidden h-[80vh]">
+            <div id="chatWindow" class="flex-1 p-6 overflow-y-auto space-y-6 bg-slate-50/50">
+                <div class="chat-bubble bg-blue-600 text-white p-5 rounded-2xl rounded-tl-none max-w-[85%] shadow-lg text-sm leading-relaxed">
+                    <strong>Welcome to B & E Solutions.</strong><br>
+                    I am your Navigator. Use the tools below to analyze legal documents or ask questions. I am grounded in 57,407 chunks of NC law.
+                </div>
+            </div>
+
+            <div class="p-4 border-t bg-white shadow-2xl">
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-2 px-2">
+                        <label for="fileInput" class="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Upload Document:</label>
+                        <input type="file" id="fileInput" accept=".pdf,image/*" 
+                            class="text-[10px] text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition cursor-pointer">
+                    </div>
+
+                    <div class="flex flex-row gap-2 h-[64px]"> 
+                        <textarea id="userInput" 
+                            class="flex-1 p-4 border-2 border-slate-100 rounded-2xl focus:border-blue-500 outline-none text-sm resize-none transition-all h-full" 
+                            placeholder="Speak, type, or upload..."></textarea>
+                        
+                        <button id="micBtn" onclick="toggleMic()" 
+                            class="w-16 h-full flex items-center justify-center bg-slate-100 text-slate-500 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition-all border border-slate-200">
+                            <svg id="micIcon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                        </button>
+
+                        <button onclick="sendMessage()" 
+                            class="px-8 h-full bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 transition active:scale-95 shadow-lg shadow-blue-200 uppercase tracking-tighter">
+                            Decode
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chatWindow');
+        const clinics = [
+            { name: "Legal Aid of North Carolina", phone: "(336) 272-0148", addr: "122 N Elm St, Greensboro" },
+            { name: "NC A&T Student Legal Services", phone: "(336) 334-7500", addr: "Murphy Hall, Suite 103" }
+        ];
+
+        document.getElementById('clinics').innerHTML = clinics.map(c => `
+            <div class="pb-3 border-b border-slate-50 last:border-0">
+                <p class="font-black text-xs text-slate-800 uppercase">${c.name}</p>
+                <p class="text-[11px] font-bold text-blue-600 mt-1">${c.phone}</p>
+                <p class="text-[10px] text-slate-400 font-medium">${c.addr}</p>
+            </div>
+        `).join('');
+
+        async function clearChat() {
+            if(confirm("Reset for a new case? This wipes all temporary session data.")) {
+                await fetch('http://localhost:3001/api/clear-session', { method: 'POST' });
+                location.reload();
+            }
+        }
+
+        async function sendMessage() {
+    const fileInput = document.getElementById('fileInput');
+    const userInput = document.getElementById('userInput');
+    let base64Data = null;
+    let fileType = null;
+
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        fileType = file.type; // Capture if it's 'application/pdf', 'image/jpeg', etc.
+        base64Data = await toBase64(file);
+    }
+
+    const text = userInput.value.trim();
+    if (!text && !base64Data) return;
+
+    const userLabel = base64Data ? `📎 Document: ${fileInput.files[0].name}` : text;
+    addBubble(userLabel, 'user'); 
+
+    const loadingId = addBubble("Navigating the Statutes...", 'bot');
+
+    try {
+        const response = await fetch('http://localhost:3001/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                message: text,
+                // Send the raw base64 string AND the file type so the server can choose the right parser
+                image: base64Data ? base64Data.split(',')[1] : null,
+                mimeType: fileType 
+            })
+        });
+
+        const data = await response.json();
+        updateBubble(loadingId, JSON.stringify(data.reply));
+        
+        fileInput.value = ""; 
+        userInput.value = "";
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById(loadingId).innerText = "The Navigator is offline.";
+    }
+}
+
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        function addBubble(text, sender) {
+    const id = "msg-" + Date.now();
+    const isUser = (sender === 'user');
+    
+    // 1. Create a clean container with NO classes initially
+    const wrapper = document.createElement('div');
+    
+    // 2. Apply "Ironclad" positioning
+    wrapper.style.display = "flex";
+    wrapper.style.width = "100%";
+    wrapper.style.marginBottom = "1.5rem";
+    // This is the absolute rule for positioning
+    wrapper.style.justifyContent = isUser ? "flex-end" : "flex-start";
+    
+    // 3. Construct the bubble with specific colors
+    // User: Gray (Slate 200), Navigator: Blue (Blue 600)
+    wrapper.innerHTML = `
+        <div id="${id}" style="
+            padding: 1.25rem; 
+            border-radius: 1rem; 
+            max-width: 80%; 
+            font-size: 0.875rem; 
+            line-height: 1.5;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            ${isUser ? 'background-color: #e2e8f0; color: #1e293b; border-top-right-radius: 0;' : 'background-color: #2563eb; color: #ffffff; border-top-left-radius: 0;'}
+        ">
+            ${text}
+        </div>
+    `;
+    
+    chatWindow.appendChild(wrapper);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return id;
+}
+
+        function updateBubble(id, text) {
+            const bubble = document.getElementById(id);
+            try {
+                const data = JSON.parse(text);
+                bubble.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-white/20 pb-2">
+                            <p class="font-black text-[10px] uppercase tracking-widest text-blue-100">Statute Analysis</p>
+                            <span class="bg-blue-400 text-[9px] px-3 py-1 rounded-full font-bold uppercase">${data.urgency} Urgency</span>
+                        </div>
+                        <p class="text-xs font-medium italic">${data.summary}</p>
+                        <div class="bg-white/10 p-3 rounded-xl border border-white/10 text-[10px]">
+                            <p><strong>Source:</strong> NCGS ${data.source}</p>
+                            <p><strong>Action:</strong> ${data.task}</p>
+                        </div>
+                        ${data.draft ? `
+                        <div class="mt-4 p-3 bg-blue-900/40 rounded-xl border border-white/10">
+                            <p class="text-[9px] font-bold text-blue-200 uppercase mb-2">Drafted Letter:</p>
+                            <p id="letter-${id}" class="text-[11px] leading-relaxed italic mb-3">"${data.draft}"</p>
+                            <button onclick="navigator.clipboard.writeText(document.getElementById('letter-${id}').innerText); this.innerText='COPIED!'" 
+                                    class="w-full bg-white text-blue-600 py-2 rounded-lg font-black text-[9px] uppercase">
+                                Copy Letter
+                            </button>
+                        </div>` : ''}
+                    </div>`;
+            } catch (e) {
+                bubble.innerText = text;
+            }
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Voice Logic
+        let recognition;
+        let isRecording = false;
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.onstart = () => {
+                isRecording = true;
+                document.getElementById('micIcon').classList.add('text-red-500', 'animate-pulse');
+            };
+            recognition.onresult = (event) => {
+                document.getElementById('userInput').value = event.results[0][0].transcript;
+            };
+            recognition.onend = () => {
+                isRecording = false;
+                document.getElementById('micIcon').classList.remove('text-red-500', 'animate-pulse');
+            };
+        }
+
+        function toggleMic() {
+            if (!recognition) return alert("Browser not supported");
+            isRecording ? recognition.stop() : recognition.start();
+        }
+    </script>
+</body>
+</html>

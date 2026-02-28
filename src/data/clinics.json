@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Legal Aid of North Carolina",
+    "location": "Greensboro Office",
+    "phone": "(336) 272-0148",
+    "specialty": "Housing, Family, & Consumer Law",
+    "address": "122 N Elm St, Greensboro, NC 27401"
+  },
+  {
+    "id": 2,
+    "name": "NC A&T Student Legal Services",
+    "location": "Campus",
+    "phone": "(336) 334-7500",
+    "address": "1601 E Market St, Greensboro, NC 27411"
+  }
+]
