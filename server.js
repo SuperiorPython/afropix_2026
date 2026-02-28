@@ -157,5 +157,5 @@ RETURN JSON: { "summary": "", "source": "NCGS Chapter ${detectedChapter || 'Gene
     }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`🛡️ B&E Navigator ACTIVE on port ${PORT}`));
+const PORT = process.env.PORT || 3001; // Use Render's port or default to 3001 locally
+app.listen(PORT, () => console.log(`🛡️ Navigator active on port ${PORT}`));
