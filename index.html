@@ -126,7 +126,7 @@
 
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        fileType = file.type; // Capture if it's 'application/pdf', 'image/jpeg', etc.
+        fileType = file.type;
         base64Data = await toBase64(file);
     }
 
@@ -135,20 +135,24 @@
 
     const userLabel = base64Data ? `📎 Document: ${fileInput.files[0].name}` : text;
     addBubble(userLabel, 'user'); 
-
     const loadingId = addBubble("Navigating the Statutes...", 'bot');
 
     try {
         const response = await fetch('https://afropix-2026-backend.onrender.com/api/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors', // EXPLICITLY ADD THIS
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json' 
+            },
             body: JSON.stringify({ 
                 message: text,
-                // Send the raw base64 string AND the file type so the server can choose the right parser
                 image: base64Data ? base64Data.split(',')[1] : null,
                 mimeType: fileType 
             })
         });
+
+        if (!response.ok) throw new Error(`Server status: ${response.status}`);
 
         const data = await response.json();
         updateBubble(loadingId, JSON.stringify(data.reply));
@@ -156,8 +160,8 @@
         fileInput.value = ""; 
         userInput.value = "";
     } catch (error) {
-        console.error("Error:", error);
-        document.getElementById(loadingId).innerText = "The Navigator is offline.";
+        console.error("Connection Error:", error);
+        document.getElementById(loadingId).innerText = "The Navigator is offline. Check Render logs.";
     }
 }
 
