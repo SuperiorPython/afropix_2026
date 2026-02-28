@@ -15,7 +15,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors()); // Explicitly handle preflight requests
+app.options('(.*)', cors()); // Explicitly handle preflight requests
 
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.static(__dirname));
