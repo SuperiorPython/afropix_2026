@@ -9,13 +9,20 @@ require('dotenv').config();
 
 const app = express();
 
-// --- 1. GLOBAL POOL (Prevents 512MB OOM) ---
+// --- 1. GLOBAL INSTANCES (Persistent Connections) ---
 let db;
 let statuteTable;
 
-app.use(cors({ origin: '*', methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type'] }));
-app.options('/*path', cors());
-app.use(express.json({ limit: '10mb' })); // Lowered limit to save RAM
+// --- 2. MIDDLEWARE (EXPRESS 5 COMPLIANT) ---
+app.use(cors({
+    origin: '*', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('/*path', cors()); 
+
+app.use(express.json({ limit: '50mb' })); 
+app.use(express.static(__dirname));
 app.use(fileUpload());
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -23,55 +30,92 @@ const embeddings = new OpenAIEmbeddings();
 
 const DB_PATH = "s3://be-advocates-legal-data/lancedb";
 const STATUTE_TABLE = 'nc_statutes';
+const SESSION_TABLE = 'session_context';
 
 /**
- * 2. SINGLETON STARTUP: Run this ONCE
+ * 3. INITIALIZATION ENGINE: Connects to S3 Once on Startup
  */
-async function startLegalEngine() {
+async function initializeLegalEngine() {
     try {
-        console.log("🔗 Connecting to S3...");
+        console.log("🔗 Connecting to S3 Legal Database...");
         db = await connect(DB_PATH);
         statuteTable = await db.openTable(STATUTE_TABLE);
-        console.log("🛡️ Engine Live: 512MB RAM Stabilized.");
-    } catch (e) { console.error("S3 Connection Failed", e); }
+        console.log("🛡️ Legal Engine Primed: 57,407 Chunks Ready.");
+    } catch (error) {
+        console.error("❌ Failed to connect to S3:", error);
+    }
 }
-startLegalEngine();
 
+initializeLegalEngine();
+
+/**
+ * 4. CORE NAVIGATOR ENGINE
+ */
 app.post('/api/chat', async (req, res) => {
     try {
-        if (!statuteTable) await startLegalEngine(); // Fallback
+        // Safety check if S3 connection dropped
+        if (!statuteTable) await initializeLegalEngine();
 
-        const { message, image, mimeType } = req.body;
+        const { message, image, mimeType } = req.body; 
         let extractedText = "";
 
-        // Ingestion logic (Keep as is)
-        if (image && mimeType === 'application/pdf') {
-            const pdfData = await pdf(Buffer.from(image, 'base64'));
-            extractedText = pdfData.text;
+        // Step A: Multi-Format Ingestion
+        if (image) {
+            if (mimeType === 'text/plain') {
+                extractedText = Buffer.from(image, 'base64').toString('utf-8');
+            } 
+            else if (mimeType === 'application/pdf') {
+                const buffer = Buffer.from(image, 'base64');
+                const pdfData = await pdf(buffer);
+                extractedText = pdfData.text;
+            } 
+            else if (mimeType && mimeType.startsWith('image/')) {
+                const visionResponse = await openai.chat.completions.create({
+                    model: "gpt-4o-mini",
+                    messages: [{
+                        role: "user",
+                        content: [
+                            { type: "text", text: "Extract legal issue and NCGS statute numbers." },
+                            { type: "image_url", image_url: { url: `data:${mimeType};base64,${image}` } }
+                        ],
+                    }],
+                });
+                extractedText = visionResponse.choices[0].message.content;
+            }
         }
 
-        const queryVector = await embeddings.embedQuery(message + extractedText);
-        
-        // REUSE GLOBAL TABLE (No new connection = No crash)
-        const statuteResults = await statuteTable.search(queryVector).limit(5).toArray(); 
+        let hybridQuery = `DOCUMENT CONTENT: ${extractedText} \n\nUSER QUESTION: ${message || "Analyze this."}`;
 
-        const context = statuteResults.map(r => `[Source: ${r.source}]\n${r.text}`).join('\n\n');
-        
+        // Step B: Vector Search (Using the Global persistent table)
+        const queryVector = await embeddings.embedQuery(hybridQuery);
+        const statuteResults = await statuteTable.search(queryVector).limit(10).toArray();
+
+        let context = statuteResults.map(r => `[Source: ${r.source}]\n${r.text}`).join('\n\n');
+
+        const systemPrompt = `
+    You are the B&E Solutions Navigator for Greensboro. 
+    Analyze the USER MESSAGE against the provided NC STATUTE CONTEXT.
+    ${context}
+    1. Warn that ignoring notices leads to a "Default Judgment" (NCGS § 1A-1).
+    2. ALWAYS include the following legal disclaimer at the end of the "advice" field: 
+       "DISCLAIMER: I am an AI Navigator, not an attorney. This analysis is for informational purposes only and should not be taken as professional legal advice at face value. Consult with a verified legal professional."
+    
+    RETURN JSON: { "summary": "", "source": "", "deadline": "", "task": "", "urgency": "", "advice": "", "draft": "" }
+`;
+
         const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: [
-                { role: "system", content: `You are the Navigator. Use context: ${context}` },
-                { role: "user", content: message }
-            ],
+            messages: [{ role: "system", content: systemPrompt }, { role: "user", content: hybridQuery }],
             response_format: { "type": "json_object" }
         });
 
         res.json({ reply: JSON.parse(completion.choices[0].message.content) });
+
     } catch (error) {
-        res.status(500).json({ error: "Navigator OOM - Restarting" });
+        console.error("Critical Error:", error);
+        res.status(500).json({ error: "The Navigator is currently offline." });
     }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`🛡️ Port ${PORT} active`));
-
+const PORT = process.env.PORT || 3001; 
+app.listen(PORT, () => console.log(`🛡️ Navigator active on port ${PORT}`));

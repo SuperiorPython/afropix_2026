@@ -24,7 +24,7 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                     </span>
-                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">57,407 Legal Chunks Indexed</p>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Here for your legal needs</p>
                 </div>
             </div>
             <button onclick="clearChat()" class="text-[10px] font-bold bg-slate-100 px-4 py-2 rounded-full hover:bg-red-50 text-slate-500 hover:text-red-600 transition border border-slate-200">
@@ -36,10 +36,17 @@
     <div class="flex-1 max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 p-4 overflow-hidden">
         
         <section class="hidden md:block md:col-span-3 space-y-4">
-            <div class="bg-white p-5 rounded-2xl border shadow-sm">
-                <h2 class="font-black text-xs mb-4 uppercase text-blue-600 tracking-widest">Local Aid (Greensboro)</h2>
-                <div id="clinics" class="space-y-4"></div>
-            </div>
+            <div class="bg-blue-600 p-5 rounded-2xl shadow-lg text-white">
+        <h2 class="font-black text-[10px] mb-3 uppercase tracking-widest opacity-80">Engine Source Data</h2>
+        <div class="space-y-3">
+            <p class="text-2xl font-black italic tracking-tighter">57,407</p>
+            <p class="text-[10px] font-bold uppercase leading-tight">Verified Chunks from NCGS</p>
+            <a href="https://www.ncleg.gov/Laws/GeneralStatutesTOC" target="_blank" 
+               class="block w-full py-2 bg-white text-blue-600 text-center rounded-lg font-black text-[9px] uppercase hover:bg-blue-50 transition">
+                View Official Statutes ↗
+            </a>
+        </div>
+    </div>
             
             <div class="space-y-2 mt-4">
     <a href="resources.html" class="block w-full py-3 bg-blue-50 text-blue-700 text-center rounded-xl font-black text-[10px] uppercase border border-blue-100 hover:bg-blue-600 hover:text-white transition">
@@ -50,12 +57,15 @@
     </a>
 </div>
 
-            <div class="p-4 bg-blue-900 text-white rounded-2xl shadow-lg">
-                <p class="text-[11px] italic font-medium leading-relaxed">
-                    "A lawyer is either a social engineer or a parasite on society." 
-                </p>
-                <p class="text-[9px] mt-2 font-bold uppercase opacity-70">— Charles Hamilton Houston</p>
-            </div>
+            <div class="p-5 bg-amber-50 border-2 border-amber-200 rounded-2xl shadow-sm">
+        <h2 class="font-black text-[10px] mb-3 uppercase tracking-widest text-amber-700 flex items-center gap-2">
+            <span>⚠️</span> Legal Disclaimer
+        </h2>
+        <p class="text-[11px] italic font-medium leading-relaxed text-amber-900">
+            "I am an AI Navigator, not an attorney. This analysis is for <strong>informational purposes only</strong> and should not be taken as professional legal advice at face value."
+        </p>
+        <p class="text-[9px] mt-3 font-bold uppercase text-amber-600">— B&E SOLUTIONS SAFETY PROTOCOL</p>
+    </div>
         </section>
 
         <section class="md:col-span-9 flex flex-col bg-white rounded-2xl shadow-xl border overflow-hidden h-[80vh]">
@@ -98,22 +108,10 @@
 
     <script>
         const chatWindow = document.getElementById('chatWindow');
-        const clinics = [
-            { name: "Legal Aid of North Carolina", phone: "(336) 272-0148", addr: "122 N Elm St, Greensboro" },
-            { name: "NC A&T Student Legal Services", phone: "(336) 334-7500", addr: "Murphy Hall, Suite 103" }
-        ];
-
-        document.getElementById('clinics').innerHTML = clinics.map(c => `
-            <div class="pb-3 border-b border-slate-50 last:border-0">
-                <p class="font-black text-xs text-slate-800 uppercase">${c.name}</p>
-                <p class="text-[11px] font-bold text-blue-600 mt-1">${c.phone}</p>
-                <p class="text-[10px] text-slate-400 font-medium">${c.addr}</p>
-            </div>
-        `).join('');
 
         async function clearChat() {
             if(confirm("Reset for a new case? This wipes all temporary session data.")) {
-                await fetch('https://be-navigator-backend.onrender.com/api/clear-session', { method: 'POST' });
+                await fetch('http://localhost:3001/api/clear-session', { method: 'POST' });
                 location.reload();
             }
         }
@@ -126,7 +124,7 @@
 
     if (fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        fileType = file.type;
+        fileType = file.type; // Capture if it's 'application/pdf', 'image/jpeg', etc.
         base64Data = await toBase64(file);
     }
 
@@ -135,24 +133,20 @@
 
     const userLabel = base64Data ? `📎 Document: ${fileInput.files[0].name}` : text;
     addBubble(userLabel, 'user'); 
+
     const loadingId = addBubble("Navigating the Statutes...", 'bot');
 
     try {
-        const response = await fetch('https://be-navigator-backend.onrender.com/api/chat', {
+        const response = await fetch('http://localhost:3001/api/chat', {
             method: 'POST',
-            mode: 'cors', // EXPLICITLY ADD THIS
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json' 
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 message: text,
+                // Send the raw base64 string AND the file type so the server can choose the right parser
                 image: base64Data ? base64Data.split(',')[1] : null,
                 mimeType: fileType 
             })
         });
-
-        if (!response.ok) throw new Error(`Server status: ${response.status}`);
 
         const data = await response.json();
         updateBubble(loadingId, JSON.stringify(data.reply));
@@ -160,8 +154,8 @@
         fileInput.value = ""; 
         userInput.value = "";
     } catch (error) {
-        console.error("Connection Error:", error);
-        document.getElementById(loadingId).innerText = "The Navigator is offline. Check Render logs.";
+        console.error("Error:", error);
+        document.getElementById(loadingId).innerText = "The Navigator is offline.";
     }
 }
 
@@ -176,28 +170,24 @@
     const id = "msg-" + Date.now();
     const isUser = (sender === 'user');
     
-    // 1. Create a clean container with NO classes initially
+    // 1. Create the outer wrapper that spans the full width of the chat window
     const wrapper = document.createElement('div');
+    wrapper.className = "flex w-full mb-6";
     
-    // 2. Apply "Ironclad" positioning
-    wrapper.style.display = "flex";
-    wrapper.style.width = "100%";
-    wrapper.style.marginBottom = "1.5rem";
-    // This is the absolute rule for positioning
-    wrapper.style.justifyContent = isUser ? "flex-end" : "flex-start";
+    // 2. This logic forces User to the Right, Navigator to the Left
+    if (isUser) {
+        wrapper.classList.add("justify-end");
+    } else {
+        wrapper.classList.add("justify-start");
+    }
     
-    // 3. Construct the bubble with specific colors
-    // User: Gray (Slate 200), Navigator: Blue (Blue 600)
+    // 3. Construct the inner bubble with the correct color and rounded corners
     wrapper.innerHTML = `
-        <div id="${id}" style="
-            padding: 1.25rem; 
-            border-radius: 1rem; 
-            max-width: 80%; 
-            font-size: 0.875rem; 
-            line-height: 1.5;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            ${isUser ? 'background-color: #e2e8f0; color: #1e293b; border-top-right-radius: 0;' : 'background-color: #2563eb; color: #ffffff; border-top-left-radius: 0;'}
-        ">
+        <div id="${id}" class="max-w-[80%] p-4 rounded-2xl shadow-md text-sm leading-relaxed ${
+            isUser 
+            ? 'bg-slate-200 text-slate-800 rounded-tr-none' // User: Gray
+            : 'bg-blue-600 text-white rounded-tl-none'     // Navigator: Blue
+        }">
             ${text}
         </div>
     `;

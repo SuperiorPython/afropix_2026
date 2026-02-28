@@ -10,84 +10,130 @@
         .reveal-visible { opacity: 1; transform: translateY(0); }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-100 text-slate-900 font-sans selection:bg-blue-500 selection:text-white">
 
-    <nav class="fixed top-0 w-full p-6 z-50 flex justify-between items-center bg-slate-900/80 backdrop-blur-md border-b border-white/5">
-        <h1 class="text-xl font-black italic tracking-tighter">B & E SOLUTIONS</h1>
-        <a href="index.html" class="text-[10px] font-bold bg-blue-600 px-6 py-2 rounded-full hover:bg-blue-700 transition uppercase tracking-widest">
-            Back to Navigator
-        </a>
-    </nav>
+    <header class="bg-white p-4 shadow-sm border-b-2 border-blue-600 sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-black italic tracking-tighter text-slate-800 uppercase">B & E SOLUTIONS</h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Mission & Philosophy</p>
+                </div>
+            </div>
+            <a href="index.html" class="text-[10px] font-bold bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition uppercase tracking-widest shadow-lg shadow-blue-200">
+                ← Back to Navigator
+            </a>
+        </div>
+    </header>
 
-    <main class="max-w-4xl mx-auto pt-32 pb-20 px-6 space-y-40">
+    <main class="max-w-5xl mx-auto pt-16 pb-32 px-6 space-y-32">
 
-        <section class="scroll-reveal min-h-[50vh] flex flex-col justify-center text-center space-y-8">
-            <h2 class="text-blue-500 font-black tracking-widest uppercase text-xs">The Philosophy</h2>
-            <blockquote class="text-4xl md:text-6xl font-black italic leading-tight">
-                "A lawyer is either a <span class="text-blue-500">social engineer</span> or a parasite on society."
-            </blockquote>
-            <div class="flex flex-col items-center gap-2">
-                <p class="text-slate-400 font-bold uppercase tracking-widest text-sm">— Charles Hamilton Houston</p>
-                <p class="text-[10px] text-slate-500 uppercase font-medium">Architect of the Civil Rights Legal Strategy</p>
+        <section class="scroll-reveal grid md:grid-cols-2 gap-12 items-center">
+            <div class="relative group">
+                <img src="official_image.jpg" alt="Blindfold Portrait" class="rounded-[3rem] shadow-2xl border-8 border-white group-hover:scale-[1.02] transition duration-500">
+                <div class="absolute -bottom-6 -right-6 bg-slate-900 text-white p-6 rounded-3xl shadow-2xl transform rotate-3">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">The Concept</p>
+                    <p class="text-xs font-bold italic">"Decoding the darkness of complexity."</p>
+                </div>
+            </div>
+            <div class="space-y-8">
+                <h2 class="text-blue-600 font-black tracking-widest uppercase text-xs">The Philosophy</h2>
+                <blockquote class="text-4xl md:text-5xl font-black italic leading-tight text-slate-800">
+                    "A lawyer is either a <span class="text-blue-600">social engineer</span> or a parasite on society."
+                </blockquote>
+                <div class="pt-4 border-t-2 border-slate-200 w-24">
+                    <p class="text-slate-500 font-bold uppercase tracking-widest text-[11px]">— Charles Hamilton Houston</p>
+                    <p class="text-[9px] text-slate-400 uppercase font-medium mt-1">Architect of the Civil Rights Legal Strategy</p>
+                </div>
             </div>
         </section>
 
         <section class="scroll-reveal space-y-12">
-            <div class="border-l-4 border-blue-600 pl-8 space-y-6">
-                <h2 class="text-blue-500 font-black tracking-widest uppercase text-xs">1931: The Legal Desert</h2>
-                <h3 class="text-4xl font-bold">The Scottsboro Boys</h3>
-                <p class="text-slate-400 text-lg leading-relaxed max-w-2xl">
-                    In March 1931, nine African American teenagers were falsely accused and forced into a legal system designed to ignore them. Their trials were a race against the clock, conducted without adequate counsel or a basic understanding of the charges. They didn't just lack a lawyer; they lacked a <strong>Navigator</strong> to decode the trap they were in.
+    <div class="bg-white rounded-[3rem] p-8 md:p-12 shadow-xl border-2 border-slate-200 relative overflow-hidden">
+        <div class="flex flex-col md:flex-row gap-12 items-center">
+            
+            <div class="w-full md:w-1/3 flex flex-col items-center">
+                <img src="Young_Black_Men_Accused_in_the_Scottsboro_Rape_Case_(cropped).jpg" 
+                     class="rounded-2xl grayscale border-4 border-white shadow-xl rotate-2 hover:rotate-0 transition duration-500 w-full">
+                <p class="text-[9px] text-slate-400 mt-4 uppercase font-black tracking-widest text-center leading-tight">
+                    82 Years to<br>Final Innocence
                 </p>
             </div>
-            
-        </section>
+
+            <div class="w-full md:w-2/3 space-y-6">
+                <h2 class="text-blue-600 font-black tracking-widest uppercase text-xs">1931: The Legal Desert</h2>
+                <h3 class="text-4xl font-black italic tracking-tighter text-slate-900 uppercase">The Scottsboro Boys</h3>
+                
+                <p class="text-slate-600 text-lg leading-relaxed">
+                    Arrested in 1931, nine teenagers were forced into a sham trial without counsel. Their case traveled to the <strong>U.S. Supreme Court</strong> in <em>Powell v. Alabama (1932)</em>, a landmark ruling that established the right to a lawyer as a fundamental pillar of <strong>Due Process</strong>.
+                </p>
+
+                <div class="bg-red-50 p-6 rounded-2xl border-l-8 border-red-500">
+                    <p class="text-red-900 text-sm font-bold leading-relaxed italic">
+                        "The system refused to yield. It took 82 years for the State of Alabama to grant posthumous pardons in 2013, finally acknowledging their innocence after nearly a century of stolen lives."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
         <section class="scroll-reveal space-y-12 text-center">
-            <h2 class="text-blue-500 font-black tracking-widest uppercase text-xs">The Modern Crisis</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-slate-800/50 p-10 rounded-3xl border border-white/5 hover:border-blue-500/50 transition">
-                    <p class="text-6xl font-black text-blue-500 mb-4">2X</p>
-                    <h4 class="text-white font-bold uppercase text-xs tracking-widest mb-4">Eviction Inequity</h4>
-                    <p class="text-slate-400 text-sm leading-relaxed">
-                        In Greensboro, Black residents face nearly double the eviction risk of white counterparts. Legal jargon often prevents tenants from exercising their rights under <strong>NCGS § 42</strong>.
+            <h2 class="text-blue-600 font-black tracking-widest uppercase text-xs">The Modern Crisis</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-blue-600 p-8 rounded-[3rem] text-white shadow-xl shadow-blue-200">
+                    <p class="text-5xl font-black mb-2">86%</p>
+                    <h4 class="font-bold uppercase text-[9px] tracking-widest mb-4 opacity-80">Access Gap</h4>
+                    <p class="text-blue-100 text-[11px] leading-relaxed">
+                        86% of civil legal issues for low-income residents go without help because the system is too complex.
                     </p>
                 </div>
-                <div class="bg-slate-800/50 p-10 rounded-3xl border border-white/5 hover:border-blue-500/50 transition">
-                    <p class="text-6xl font-black text-blue-500 mb-4">50%</p>
-                    <h4 class="text-white font-bold uppercase text-xs tracking-widest mb-4">Default Loss</h4>
-                    <p class="text-slate-400 text-sm leading-relaxed">
-                        Studies show half of marginalized residents do not respond to court summons because the complexity of the law acts as a barrier, leading to immediate default judgments.
+                <div class="bg-white p-8 rounded-[3rem] border-2 border-slate-200 shadow-sm">
+                    <p class="text-5xl font-black text-slate-800 mb-2">50%</p>
+                    <h4 class="font-bold uppercase text-[9px] tracking-widest mb-4 text-blue-600">Default Rate</h4>
+                    <p class="text-slate-500 text-[11px] leading-relaxed">
+                        Half of tenants lose evictions automatically because they cannot "decode" how to file a response.
+                    </p>
+                </div>
+                <div class="bg-slate-900 p-8 rounded-[3rem] text-white shadow-xl">
+                    <p class="text-5xl font-black text-blue-500 mb-2">71%</p>
+                    <h4 class="font-bold uppercase text-[9px] tracking-widest mb-4 opacity-80">Unrecognized Issues</h4>
+                    <p class="text-slate-400 text-[11px] leading-relaxed">
+                        Most households face legal problems annually but fail to recognize them due to illiteracy.
                     </p>
                 </div>
             </div>
         </section>
 
-        <section class="scroll-reveal text-center space-y-10 py-20 bg-blue-600 rounded-[3rem]">
-            <h2 class="text-white font-black tracking-widest uppercase text-xs">Our Solution</h2>
-            <div class="space-y-4 px-6">
-                <h3 class="text-4xl md:text-5xl font-black text-white italic">57,407 Chunks of Justice.</h3>
-                <p class="text-blue-100 max-w-xl mx-auto text-lg">
-                    We have indexed the entire North Carolina General Statutes. Every rule, every right, and every protection is now searchable in plain English for the Greensboro community.
+        <section class="scroll-reveal text-center py-20 bg-white border-4 border-blue-600 rounded-[4rem] shadow-2xl relative overflow-hidden">
+            <div class="space-y-8 px-6">
+                <h3 class="text-5xl font-black text-slate-900 italic tracking-tighter">57,407 CHUNKS OF EQUITY.</h3>
+                <p class="text-slate-500 max-w-xl mx-auto text-sm uppercase tracking-widest font-bold">
+                    Bridging the gap between the statute and the citizen.
                 </p>
+                <a href="index.html" class="inline-block bg-blue-600 text-white px-12 py-5 rounded-full font-black uppercase tracking-widest hover:bg-blue-700 hover:scale-105 transition shadow-2xl shadow-blue-200">
+                    Enter the Navigator
+                </a>
             </div>
-            <a href="index.html" class="inline-block bg-white text-blue-600 px-12 py-5 rounded-full font-black uppercase tracking-widest hover:scale-105 transition shadow-2xl">
-                Enter the Navigator
-            </a>
         </section>
 
     </main>
 
+    <footer class="p-8 text-center border-t border-slate-200 bg-white">
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">© 2026 B & E Solutions | Built for Afropix | NC A&T Computer Science</p>
+    </footer>
+
     <script>
-        // Simple scroll reveal effect
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('reveal-visible');
             });
         }, { threshold: 0.1 });
-
         document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
     </script>
-
 </body>
 </html>
