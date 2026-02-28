@@ -4,22 +4,27 @@ const cors = require('cors');
 const { connect } = require('@lancedb/lancedb');
 const { OpenAIEmbeddings } = require('@langchain/openai');
 const fileUpload = require('express-fileupload');
-const pdf = require('pdf-parse'); // Ensure this is required
+const pdf = require('pdf-parse'); 
 require('dotenv').config();
 
 const app = express();
-app.use(express.json({ limit: '50mb' })); 
+
+// --- 1. MIDDLEWARE (CORS MUST BE FIRST) ---
 app.use(cors({
-    origin: '*', // This allows any website (like your Netlify app) to talk to this server
+    origin: '*', // Allows Netlify to communicate with Render
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+app.options('*', cors()); // Explicitly handle preflight requests
+
+app.use(express.json({ limit: '50mb' })); 
 app.use(express.static(__dirname));
-app.options('*', cors());
+app.use(fileUpload());
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const embeddings = new OpenAIEmbeddings();
 
+// --- 2. CLOUD CONFIGURATION ---
 const DB_PATH = "s3://be-advocates-legal-data/lancedb";
 const SESSION_TABLE = 'session_context';
 const STATUTE_TABLE = 'nc_statutes';
@@ -32,10 +37,8 @@ const chapterMap = {
     "122C": "Mental Health"
 };
 
-app.use(fileUpload());
-
 /**
- * 1. TRAINING & CLEAR SESSION ENDPOINTS (Keeping your existing logic)
+ * 3. SESSION MANAGEMENT
  */
 app.post('/api/train', async (req, res) => {
     try {
@@ -59,7 +62,7 @@ app.post('/api/clear-session', async (req, res) => {
 });
 
 /**
- * 2. MAIN CHAT: Hybrid Ingestion and Single-Pass S3 Search
+ * 4. CORE NAVIGATOR ENGINE (Hybrid Search)
  */
 app.post('/api/chat', async (req, res) => {
     try {
@@ -94,7 +97,7 @@ app.post('/api/chat', async (req, res) => {
         // Step B: Build Hybrid Query
         let hybridQuery = `DOCUMENT CONTENT: ${extractedText} \n\nUSER QUESTION: ${message || "Analyze this."}`;
 
-        // Step C: Chapter Locking
+        // Step C: Chapter Locking Logic
         let detectedChapter = "";
         const scanText = hybridQuery.toLowerCase();
         for (const [num, keywords] of Object.entries(chapterMap)) {
@@ -104,10 +107,8 @@ app.post('/api/chat', async (req, res) => {
             }
         }
 
-        // Step D: Final "Boosted" Query for Vector Search
+        // Step D: Vector Search on S3
         const finalSearchString = detectedChapter ? `NCGS Chapter ${detectedChapter} ${hybridQuery}` : hybridQuery;
-        
-        // Step E: Single S3 Connection & Search
         const db = await connect(DB_PATH);
         const queryVector = await embeddings.embedQuery(finalSearchString);
         
@@ -120,30 +121,28 @@ app.post('/api/chat', async (req, res) => {
             sessionResults = await sessionTable.search(queryVector).limit(3).toArray();
         } catch (e) {}
 
-        // Step F: Format Context
+        // Step E: Context Assembly
         let retrievedContext = detectedChapter ? `*** PRIMARY LEGAL FOCUS: NCGS CHAPTER ${detectedChapter} ***\n` : "";
         statuteResults.forEach(r => retrievedContext += `[Source: ${r.source}]\n${r.text}\n\n`);
+        
         if (sessionResults.length > 0) {
             retrievedContext += "--- USER PERSONAL DOCUMENTS ---\n";
             sessionResults.forEach(r => retrievedContext += `[Doc: ${r.source}]\n${r.text}\n`);
         }
 
-        let context = statuteResults.map(r => `[Source: ${r.source}]\n${r.text}`).join('\n\n');
-
-// Step 2: The Tightened Prompt
-const systemPrompt = `
+        // Step F: Tightened AI Response
+        const systemPrompt = `
 You are the B&E Solutions Navigator for Greensboro. 
 Analyze the USER MESSAGE against the provided NC STATUTE CONTEXT.
 
 CONTEXT FROM 57,407 NCGS CHUNKS:
-${context}
+${retrievedContext}
 
 OPERATIONAL DIRECTIVES:
-1. DEFINITION MODE: If the user asks for a general definition (e.g., "What is a speeding ticket?"), provide a clear explanation first, then cite the relevant NCGS Chapter found in the context (usually Chapter 20 for traffic).
-2. CASE ANALYSIS MODE: If a document is uploaded, cross-reference it with the context to find specific deadlines or penalties.
-3. THE INDEPENDENT OBLIGATION RULE: Always emphasize that under NC law, most obligations are independent (e.g., you cannot withhold rent for lack of repairs without a court order).
-4. MANDATORY WARNING: You MUST warn that ignoring legal notices leads to a "Default Judgment" (NCGS § 1A-1).
-5. NO CONVERSATIONAL FILLER: Do not say "I understand" or "As an AI." Be a direct Navigator.
+1. DEFINITION MODE: Provide a clear explanation first, then cite the relevant NCGS Chapter.
+2. INDEPENDENT OBLIGATION RULE: Emphasize that rent and repairs are independent obligations in NC.
+3. MANDATORY WARNING: Warn that ignoring legal notices leads to a "Default Judgment" (NCGS § 1A-1).
+4. NO CONVERSATIONAL FILLER: Be a direct Navigator.
 
 RETURN JSON: { "summary": "", "source": "NCGS Chapter ${detectedChapter || 'General'}", "deadline": "", "task": "", "urgency": "", "advice": "", "draft": "" }
 `;
@@ -162,5 +161,6 @@ RETURN JSON: { "summary": "", "source": "NCGS Chapter ${detectedChapter || 'Gene
     }
 });
 
-const PORT = process.env.PORT || 3001; // Use Render's port or default to 3001 locally
+// --- 5. START SERVER ---
+const PORT = process.env.PORT || 3001; 
 app.listen(PORT, () => console.log(`🛡️ Navigator active on port ${PORT}`));
