@@ -9,8 +9,13 @@ require('dotenv').config();
 
 const app = express();
 app.use(express.json({ limit: '50mb' })); 
-app.use(cors());
+app.use(cors({
+    origin: '*', // This allows any website (like your Netlify app) to talk to this server
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.static(__dirname));
+app.options('*', cors());
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const embeddings = new OpenAIEmbeddings();
