@@ -15,7 +15,7 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('(.*)', cors()); // Explicitly handle preflight requests
+app.options('/:splat*', cors()); // Explicitly handle preflight requests
 
 app.use(express.json({ limit: '50mb' })); 
 app.use(express.static(__dirname));
@@ -164,3 +164,4 @@ RETURN JSON: { "summary": "", "source": "NCGS Chapter ${detectedChapter || 'Gene
 // --- 5. START SERVER ---
 const PORT = process.env.PORT || 3001; 
 app.listen(PORT, () => console.log(`🛡️ Navigator active on port ${PORT}`));
+
