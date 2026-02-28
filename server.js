@@ -14,7 +14,7 @@ let db;
 let statuteTable;
 
 app.use(cors({ origin: '*', methods: ['GET', 'POST', 'OPTIONS'], allowedHeaders: ['Content-Type'] }));
-app.options('(.*)', cors());
+app.options('/*path', cors());
 app.use(express.json({ limit: '10mb' })); // Lowered limit to save RAM
 app.use(fileUpload());
 
@@ -74,3 +74,4 @@ app.post('/api/chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`🛡️ Port ${PORT} active`));
+
