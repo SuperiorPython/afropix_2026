@@ -1,0 +1,32 @@
+{
+  "name": "afropix_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuperiorPython/afropix_2026.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SuperiorPython/afropix_2026/issues"
+  },
+  "homepage": "https://github.com/SuperiorPython/afropix_2026#readme",
+  "dependencies": {
+    "@lancedb/lancedb": "^0.26.2",
+    "@langchain/openai": "^1.2.11",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-fileupload": "^1.5.2",
+    "openai": "^6.25.0",
+    "pdf-parse": "^2.4.5"
+  }
+}
